@@ -1,0 +1,18 @@
+data:
+  train: data/raw/train.csv
+  later: data/raw/later.csv
+  holdout: data/raw/holdout_features.csv
+
+columns:
+  id: record_id
+  date: date
+  target: metres_per_shift
+  group: shed
+  numeric: [loom_age_yr, thread_count, power_cuts_min, weaver_exp_yr, humidity_pct, shift_hours]
+  categorical: [fabric, shed]
+
+checks:
+  sentinel_candidates: [-1, -99, -999, 999, 9999]
+  unit_factors: [10, 12, 60, 100, 1000]   # exact conversions we test for
+  stuck_min_run: 20                       # rows in a row with one value = stuck
+  leak_corr: 0.99                         # |corr| with target above this = leak
