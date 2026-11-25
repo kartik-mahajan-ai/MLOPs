@@ -48,7 +48,7 @@ pytest -q                        # tests (no CSVs needed)
 ## Results
 
 - v1: Ridge, validation MAE 2.33 m (best of 4 settings).
-- Drift: `loom_age_yr` moved most (PSI 3.47) — looms in later.csv are 14–44 years old vs 0–30 in train.
+- Drift: `loom_age_yr` moved most (PSI 3.47) â€” looms in later.csv are 14â€“44 years old vs 0â€“30 in train.
 - v1 serves `Shed 3` worst (MAE 9.68 on later.csv).
 - v2 (train + first 70% of later.csv) beats v1 on the last 30%: 4.45 vs 4.97 (10.5% lower) -> **promoted**, v2 is `@champion`.
 
