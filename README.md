@@ -1,3 +1,4 @@
+
 # MP088 — Power Loom Output (Nagpur)
 
 **Group:** G262  **Problem:** MP088  **Faculty:** Yadit Kumar  **Batch:** 6
