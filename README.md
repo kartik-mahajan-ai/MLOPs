@@ -42,14 +42,16 @@ pytest -q                        # tests (no CSVs needed)
 | `src/mp088/model.py` | scikit-learn pipeline: impute + scale + one-hot, then regressor |
 | `src/mp088/train.py` | v1 training with MLflow tracking and registry |
 | `app/main.py` | FastAPI: `POST /predict`, `GET /health`, JSON logs to stdout |
+| `k8s/` | Deployment `mp088-api` (3 replicas) and Service `mp088-svc` (80 -> 8000) |
 
 ## Results
 
 - v1: Ridge, validation MAE 2.33 m (best of 4 settings), registered as `mp088-loom-model` v1 `@champion`.
 
-## Docker
+## Docker / Kubernetes
 
 ```bash
 docker build -t mp088-api:1.0 .
 docker run -p 8000:8000 mp088-api:1.0
+kubectl apply -f k8s/
 ```

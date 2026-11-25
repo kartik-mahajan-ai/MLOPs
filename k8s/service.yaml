@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mp088-svc
+spec:
+  selector:
+    app: mp088-api
+  ports:
+    - port: 80
+      targetPort: 8000
