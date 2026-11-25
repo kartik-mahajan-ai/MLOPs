@@ -41,7 +41,7 @@ pytest -q                        # tests (no CSVs needed)
 | `src/mp088/cleaning.py` | fixes them (train.csv only) |
 | `src/mp088/model.py` | scikit-learn pipeline: impute + scale + one-hot, then regressor |
 | `src/mp088/train.py` | v1 training with MLflow tracking and registry |
-| `app/main.py` | FastAPI: `POST /predict`, `GET /health` |
+| `app/main.py` | FastAPI: `POST /predict`, `GET /health`, JSON logs to stdout |
 
 ## Results
 

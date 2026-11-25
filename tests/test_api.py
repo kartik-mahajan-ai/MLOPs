@@ -1,3 +1,4 @@
+import json
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -35,3 +36,11 @@ def test_missing_field_rejected():
     body = dict(GOOD)
     body.pop("shed")
     assert client.post("/predict", json=body).status_code == 422
+
+
+def test_json_logging_on_predict(capsys):
+    r = client.post("/predict", json=GOOD)
+    assert r.status_code == 200
+    captured = capsys.readouterr()
+    log_lines = [json.loads(line) for line in captured.out.strip().split("\n") if line.strip().startswith("{")]
+    assert any(entry.get("event") == "prediction" and "prediction" in entry and "latency_ms" in entry for entry in log_lines)
