@@ -39,9 +39,9 @@ data_issues:
 
 tracking:
   experiment_name: "mp088-loom-output"
-  best_run_id: "637ca713dd3245e88d0b1dd4cd33688d"        # the MLflow run id of your v1 model
+  best_run_id: "62d38df1567445dc8597ca643dcdd3fb"        # the MLflow run id of your v1 model
   registered_model_name: "mp088-loom-model"
-  champion_version: 1
+  champion_version: 2
 
 monitoring:
   psi:                     # cleaned train.csv vs later.csv, 10 bins
