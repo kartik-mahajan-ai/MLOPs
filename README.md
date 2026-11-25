@@ -16,13 +16,46 @@ Predict `metres_per_shift` (regression, MAE) for each loom shift.
 ```bash
 python -m venv .venv && .venv/Scripts/activate   # Linux/macOS: source .venv/bin/activate
 pip install -r requirements.txt
-dvc pull    # or copy the CSVs from the zip into data/raw/
+pip install dvc
+dvc pull    # or copy train.csv and later.csv from the zip into data/raw/
 ```
 
-## Data checks
+## Run the pipeline (from the repo root, with `src/` on the path)
 
 ```bash
-PYTHONPATH=src python -m mp088.data_checks
+export PYTHONPATH=src            # PowerShell: $env:PYTHONPATH="src"
+python -m mp088.data_checks      # stage 1: the seven data problems -> reports/findings.yaml
+python -m mp088.train            # stage 2: clean, 4 settings tracked in MLflow, best -> v1 @champion
+python -m mp088.monitor          # stage 4: PSI, MAE per shed, v2 retrain, promotion rule, holdout predictions
+pytest -q                        # tests (no CSVs needed)
 ```
 
-Prints the result of all seven data-problem checks; results are recorded in `reports/findings.yaml`.
+`python -m mp088.train` must run on a fresh `mlflow.db` (it registers version 1).
+
+## Layout
+
+| Path | What |
+|---|---|
+| `params.yaml` | paths, cleaning rules, model settings (read by every module) |
+| `src/mp088/data_checks.py` | finds the seven data problems |
+| `src/mp088/cleaning.py` | fixes them (train.csv only) |
+| `src/mp088/model.py` | scikit-learn pipeline: impute + scale + one-hot, then regressor |
+| `src/mp088/train.py` | v1 training with MLflow tracking and registry |
+| `src/mp088/monitor.py` | drift, retrain, promotion, holdout prediction |
+| `app/main.py` | FastAPI: `POST /predict`, `GET /health`, JSON logs to stdout |
+| `k8s/` | Deployment `mp088-api` (3 replicas) and Service `mp088-svc` (80 -> 8000) |
+
+## Results
+
+- v1: Ridge, validation MAE 2.33 m (best of 4 settings).
+- Drift: `loom_age_yr` moved most (PSI 3.47) — looms in later.csv are 14–44 years old vs 0–30 in train.
+- v1 serves `Shed 3` worst (MAE 9.68 on later.csv).
+- v2 (train + first 70% of later.csv) beats v1 on the last 30%: 4.45 vs 4.97 (10.5% lower) -> **promoted**, v2 is `@champion`.
+
+## Docker / Kubernetes
+
+```bash
+docker build -t mp088-api:1.0 .
+docker run -p 8000:8000 mp088-api:1.0
+kubectl apply -f k8s/
+```

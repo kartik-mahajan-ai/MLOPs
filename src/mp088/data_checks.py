@@ -42,9 +42,10 @@ def find_unit_mixup(train, cfg):
             if others <= 0 or m / others < 5:
                 continue
             ratio = m / others
-            factor = min(cfg["checks"]["unit_factors"],
-                         key=lambda f: abs(np.log(ratio / f)))
             vals = train.loc[train[group] == g, col]
+            # prefer factors that divide every value exactly, then the one nearest the ratio
+            factor = min(cfg["checks"]["unit_factors"],
+                         key=lambda f: (-(vals % f == 0).mean(), abs(np.log(ratio / f))))
             share_exact = float((vals % factor == 0).mean())
             return {"present": True, "column": col, "group_value": g,
                     "factor": factor, "ratio_seen": round(ratio, 2),

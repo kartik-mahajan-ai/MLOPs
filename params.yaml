@@ -16,3 +16,34 @@ checks:
   unit_factors: [10, 12, 60, 100, 1000]   # exact conversions we test for
   stuck_min_run: 20                       # rows in a row with one value = stuck
   leak_corr: 0.99                         # |corr| with target above this = leak
+
+# Fixes for the problems found by mp088.data_checks (see reports/findings.yaml)
+cleaning:
+  leak_column: metres_checked_at_folding
+  unit_mixup: {column: power_cuts_min, group_value: "Shed 1", factor: 60}
+  sentinel: {column: humidity_pct, value: -999}
+  stuck: {column: thread_count, value: 95, start_date: "2026-03-26", end_date: "2026-04-13"}
+
+mlflow:
+  tracking_uri: sqlite:///mlflow.db
+  experiment_name: mp088-loom-output
+  registered_model_name: mp088-loom-model
+
+train:
+  val_fraction: 0.2        # last 20% of cleaned train (by date) used to compare settings
+  random_state: 42
+  candidates:
+    - {name: ridge, alpha: 1.0}
+    - {name: random_forest, n_estimators: 300, max_depth: 12}
+    - {name: gradient_boosting, n_estimators: 300, learning_rate: 0.05, max_depth: 3}
+    - {name: gradient_boosting, n_estimators: 600, learning_rate: 0.03, max_depth: 4}
+
+monitoring:
+  psi_bins: 10
+  retrain_fraction: 0.7    # first 70% of later.csv (by date) added for v2
+  promote_if_better_by: 0.10
+
+paths:
+  model: models/model.joblib
+  predictions: predictions/holdout_predictions.csv
+  monitoring_report: reports/monitoring.json
