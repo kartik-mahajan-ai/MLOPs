@@ -1,11 +1,10 @@
-"""Tests for cleaning, data checks and PSI, on small data built here (no CSVs needed)."""
+"""Tests for cleaning and data checks, on small data built here (no CSVs needed)."""
 import numpy as np
 import pandas as pd
 
 from mp088.cleaning import clean_train
 from mp088.config import load_params
 from mp088.data_checks import find_duplicate_rows, find_sentinel_value, find_unit_mixup
-from mp088.monitor import psi
 
 CFG = load_params()
 
@@ -47,10 +46,3 @@ def test_checks_find_planted_problems():
     assert (s["column"], s["value"], s["count"]) == ("humidity_pct", -999, 4)
     u = find_unit_mixup(df, CFG)
     assert (u["column"], u["group_value"], u["factor"]) == ("power_cuts_min", "Shed 1", 60)
-
-
-def test_psi_zero_for_same_data_and_large_for_shift():
-    rng = np.random.default_rng(0)
-    x = rng.normal(0, 1, 2000)
-    assert psi(x, x) < 0.01
-    assert psi(x, x + 3) > 1

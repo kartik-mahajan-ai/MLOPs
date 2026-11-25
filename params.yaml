@@ -38,12 +38,5 @@ train:
     - {name: gradient_boosting, n_estimators: 300, learning_rate: 0.05, max_depth: 3}
     - {name: gradient_boosting, n_estimators: 600, learning_rate: 0.03, max_depth: 4}
 
-monitoring:
-  psi_bins: 10
-  retrain_fraction: 0.7    # first 70% of later.csv (by date) added for v2
-  promote_if_better_by: 0.10
-
 paths:
   model: models/model.joblib
-  predictions: predictions/holdout_predictions.csv
-  monitoring_report: reports/monitoring.json
